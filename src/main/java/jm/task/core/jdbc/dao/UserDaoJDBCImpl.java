@@ -75,7 +75,7 @@ public class UserDaoJDBCImpl extends Util implements UserDao {
 
     public void removeUserById(long id) {
         PreparedStatement preparedStatement;
-        String sqlQuery = "DELETE FROM idea.user WHERE id=?";
+        final String sqlQuery = "DELETE FROM idea.user WHERE id=?";
         try {
             preparedStatement = connection.prepareStatement(sqlQuery);
             preparedStatement.setLong(1, id);
@@ -89,7 +89,7 @@ public class UserDaoJDBCImpl extends Util implements UserDao {
 
     public List<User> getAllUsers() {
         List<User> users = new ArrayList<>();
-        String sqlQuery = "SELECT ID, name, lastName, age FROM idea.user";
+        final String sqlQuery = "SELECT ID, name, lastName, age FROM idea.user";
 
         try {
             DatabaseMetaData md = connection.getMetaData();
@@ -115,7 +115,7 @@ public class UserDaoJDBCImpl extends Util implements UserDao {
     }
 
     public void cleanUsersTable() {
-        String sqlQuery = "DELETE FROM idea.user";
+        final String sqlQuery = "DELETE FROM idea.user";
         try {
             DatabaseMetaData md = connection.getMetaData();
             ResultSet rs = md.getTables(null, "idea", "User", new String[] {"table"});

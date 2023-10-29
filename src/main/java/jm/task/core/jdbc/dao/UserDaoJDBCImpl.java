@@ -8,13 +8,14 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class UserDaoJDBCImpl extends Util implements UserDao {
-    private final Connection connection = getConnection();
+    private final Connection connection;
 
     public UserDaoJDBCImpl() {
+        connection = new Util().getConnection();
     }
 
     public void createUsersTable() {
-        PreparedStatement preparedStatement;
+        PreparedStatement preparedStatement = null;
         final String sqlQuery = "CREATE TABLE User (id int NOT NULL UNIQUE AUTO_INCREMENT, name VARCHAR(255), lastName VARCHAR(255), age int)";
 
         try {
@@ -28,12 +29,20 @@ public class UserDaoJDBCImpl extends Util implements UserDao {
                 System.out.println("Таблица уже существует");
             }
         } catch (SQLException e) {
-            throw new RuntimeException(e);
+            System.out.println("Таблица в базе данных не создана");
+        } finally {
+            if (preparedStatement != null) {
+                try {
+                    preparedStatement.close();
+                } catch (SQLException e) {
+                    throw new RuntimeException(e);
+                }
+            }
         }
     }
 
     public void dropUsersTable() {
-        PreparedStatement preparedStatement;
+        PreparedStatement preparedStatement = null;
         final String sqlQuery = "DROP TABLE idea.user";
 
         try {
@@ -48,16 +57,24 @@ public class UserDaoJDBCImpl extends Util implements UserDao {
                 System.out.println("Таблица не удалена");
             }
         } catch (SQLException e) {
-            throw new RuntimeException(e);
+            System.out.println("Таблица  не удалена");
+        } finally {
+            if (preparedStatement != null) {
+                try {
+                    preparedStatement.close();
+                } catch (SQLException e) {
+                    throw new RuntimeException(e);
+                }
+            }
         }
     }
 
     public void saveUser(String name, String lastName, byte age) {
-        PreparedStatement preparedStatement;
+        PreparedStatement preparedStatement = null;
         final String sqlQuery = "INSERT INTO idea.user (name, lastName, age) VALUES (?, ?, ?)";
         try {
             DatabaseMetaData md = connection.getMetaData();
-            ResultSet rs = md.getTables(null, "idea", "User", new String[] {"table"});
+            ResultSet rs = md.getTables(null, "idea", "User", new String[]{"table"});
             if (rs.next()) {
                 preparedStatement = connection.prepareStatement(sqlQuery);
                 preparedStatement.setString(1, name);
@@ -65,16 +82,22 @@ public class UserDaoJDBCImpl extends Util implements UserDao {
                 preparedStatement.setByte(3, age);
                 preparedStatement.executeUpdate();
                 System.out.println("User с именем – " + name + " добавлен в таблицу");
-            } else {
-                System.out.println("Пользователь не добавлен");
             }
         } catch (SQLException e) {
-            throw new RuntimeException(e);
+            System.out.println("Пользователь не добавлен в таблицу");
+        } finally {
+            if (preparedStatement != null) {
+                try {
+                    preparedStatement.close();
+                } catch (SQLException e) {
+                    throw new RuntimeException(e);
+                }
+            }
         }
     }
 
     public void removeUserById(long id) {
-        PreparedStatement preparedStatement;
+        PreparedStatement preparedStatement = null;
         final String sqlQuery = "DELETE FROM idea.user WHERE id=?";
         try {
             preparedStatement = connection.prepareStatement(sqlQuery);
@@ -83,7 +106,15 @@ public class UserDaoJDBCImpl extends Util implements UserDao {
 
             System.out.println("Пользовутель удален");
         } catch (SQLException e) {
-            throw new RuntimeException(e);
+            System.out.println("Пользователь не удален из таблицы");
+        } finally {
+            if (preparedStatement != null) {
+                try {
+                    preparedStatement.close();
+                } catch (SQLException e) {
+                    throw new RuntimeException(e);
+                }
+            }
         }
     }
 
@@ -105,30 +136,35 @@ public class UserDaoJDBCImpl extends Util implements UserDao {
                     user.setAge(resultUsers.getByte("age"));
                     users.add(user);
                 }
-            } else {
-                System.out.println("Таблица не найдена или удалена");
             }
         } catch (SQLException e) {
-            throw new RuntimeException(e);
+            System.out.println("Таблица не найдена или удалена");
         }
         return users;
     }
 
     public void cleanUsersTable() {
+        PreparedStatement preparedStatement = null;
         final String sqlQuery = "DELETE FROM idea.user";
         try {
             DatabaseMetaData md = connection.getMetaData();
             ResultSet rs = md.getTables(null, "idea", "User", new String[] {"table"});
             if (rs.next()) {
-                PreparedStatement preparedStatement = connection.prepareStatement(sqlQuery);
+                preparedStatement = connection.prepareStatement(sqlQuery);
                 System.out.println("Таблица существует и будет отчищена");
                 preparedStatement.executeUpdate();
                 System.out.println("Таблица отчищена");
-            } else {
-                System.out.println("Таблица не найдена или удалена");
             }
         } catch (SQLException e) {
-            throw new RuntimeException(e);
+            System.out.println("Таблица не отчищена");
+        } finally {
+            if (preparedStatement != null) {
+                try {
+                    preparedStatement.close();
+                } catch (SQLException e) {
+                    throw new RuntimeException(e);
+                }
+            }
         }
     }
 }

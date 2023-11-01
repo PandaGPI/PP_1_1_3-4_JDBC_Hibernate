@@ -22,7 +22,7 @@ public class UserDaoJDBCImpl extends Util implements UserDao {
             ResultSet rs = md.getTables(null, "idea", "User", new String[] {"table"});
             if (!rs.next()) {
                 statement = connection.createStatement();
-                statement.executeUpdate(sqlQuery);
+                statement.execute(sqlQuery);
                 System.out.println("Таблица создана");
             } else {
                 System.out.println("Таблица уже существует");
@@ -50,7 +50,7 @@ public class UserDaoJDBCImpl extends Util implements UserDao {
             if (rs.next()) {
                 System.out.println("Таблица существует и будет удалена");
                 statement = connection.createStatement();
-                statement.executeUpdate(sqlQuery);
+                statement.execute(sqlQuery);
                 System.out.println("Таблица удалена");
             } else {
                 System.out.println("Таблица не удалена");
@@ -79,7 +79,7 @@ public class UserDaoJDBCImpl extends Util implements UserDao {
                 preparedStatement.setString(1, name);
                 preparedStatement.setString(2, lastName);
                 preparedStatement.setByte(3, age);
-                preparedStatement.executeUpdate();
+                preparedStatement.execute();
                 System.out.println("User с именем – " + name + " добавлен в таблицу");
             }
         } catch (SQLException e) {
@@ -101,7 +101,7 @@ public class UserDaoJDBCImpl extends Util implements UserDao {
         try {
             preparedStatement = connection.prepareStatement(sqlQuery);
             preparedStatement.setLong(1, id);
-            preparedStatement.executeUpdate();
+            preparedStatement.execute();
 
             System.out.println("Пользовутель удален");
         } catch (SQLException e) {
@@ -151,7 +151,7 @@ public class UserDaoJDBCImpl extends Util implements UserDao {
             if (rs.next()) {
                 statement = connection.createStatement();
                 System.out.println("Таблица существует и будет отчищена");
-                statement.executeUpdate(sqlQuery);
+                statement.execute(sqlQuery);
                 System.out.println("Таблица отчищена");
             }
         } catch (SQLException e) {

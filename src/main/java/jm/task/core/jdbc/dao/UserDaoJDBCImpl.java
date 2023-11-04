@@ -7,16 +7,16 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class UserDaoJDBCImpl extends Util implements UserDao {
-    private final Connection connection;
+    private Connection connection;
 
     public UserDaoJDBCImpl() {
-        connection = new Util().getConnection();
+
     }
 
     public void createUsersTable() {
         Statement statement = null;
-        final String sqlQuery = "CREATE TABLE User (id int NOT NULL UNIQUE AUTO_INCREMENT, name VARCHAR(255), lastName VARCHAR(255), age int)";
-
+        final String sqlQuery = "CREATE TABLE User " +
+                "(id int NOT NULL UNIQUE AUTO_INCREMENT, name VARCHAR(255), lastName VARCHAR(255), age int)";
         try {
             DatabaseMetaData md = connection.getMetaData();
             ResultSet rs = md.getTables(null, "idea", "User", new String[] {"table"});

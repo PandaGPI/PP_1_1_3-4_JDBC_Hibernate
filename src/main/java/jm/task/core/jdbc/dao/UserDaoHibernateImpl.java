@@ -26,11 +26,11 @@ public class UserDaoHibernateImpl implements UserDao {
 
     @Override
     public void createUsersTable() {
-        try (Session session = getSessionFactory().openSession()) {
+        try (Session session = sessionFactory.openSession()) {
 
             session.doWork(new Work() {
                 @Override
-                public void execute(Connection connection) throws SQLException {
+                public void execute(Connection connection) {
                     Transaction transaction = null;
                     try {
                         DatabaseMetaData dbm = connection.getMetaData();
@@ -40,6 +40,7 @@ public class UserDaoHibernateImpl implements UserDao {
                             transaction = session.beginTransaction();
                             session.createSQLQuery(sql).executeUpdate();
                             session.getTransaction().commit();
+                            session.close();
                         }
                     } catch (Exception e) {
                         e.printStackTrace();
@@ -60,7 +61,7 @@ public class UserDaoHibernateImpl implements UserDao {
 
             session.doWork(new Work() {
                 @Override
-                public void execute(Connection connection) throws SQLException {
+                public void execute(Connection connection) {
                     Transaction transaction = null;
                     try {
                         DatabaseMetaData dbm = connection.getMetaData();
@@ -70,8 +71,9 @@ public class UserDaoHibernateImpl implements UserDao {
                             transaction = session.beginTransaction();
                             session.createSQLQuery(sql).executeUpdate();
                             session.getTransaction().commit();
+                            session.close();
                         }
-                    } catch (Exception e) {
+                    } catch (SQLException e) {
                         e.printStackTrace();
                         assert transaction != null;
                         transaction.rollback();
@@ -91,6 +93,7 @@ public class UserDaoHibernateImpl implements UserDao {
             transaction = session.beginTransaction();
             session.save(user);
             session.getTransaction().commit();
+            session.close();
         } catch (Exception e) {
             e.printStackTrace();
             assert transaction != null;
@@ -102,10 +105,11 @@ public class UserDaoHibernateImpl implements UserDao {
     public void removeUserById(long id) {
         Transaction transaction = null;
         final String hql = "DELETE from User where id = :userId";
-        try (Session session = Util.getSessionFactory().openSession()) {
+        try (Session session = sessionFactory.openSession()) {
             transaction = session.beginTransaction();
             session.createQuery(hql).setParameter("userId", id).executeUpdate();
             session.getTransaction().commit();
+            session.close();
         } catch (Exception e) {
             e.printStackTrace();
             System.out.println("Таблицы не существует");
@@ -116,28 +120,24 @@ public class UserDaoHibernateImpl implements UserDao {
 
     @Override
     public List<User> getAllUsers() {
-        Transaction transaction = null;
-        List<User> users = new ArrayList<>();
+        List<User> users = null;
         final String hql = "FROM User";
-        try (Session session = Util.getSessionFactory().openSession()) {
-            transaction = session.beginTransaction();
+        try (Session session = sessionFactory.openSession()) {
             users = session.createQuery(hql).list();
-            session.getTransaction().commit();
+            session.close();
         } catch (Exception e) {
             e.printStackTrace();
             System.out.println("Таблицы не существует");
-            assert transaction != null;
-            transaction.rollback();
         }
         return users;
     }
 
     @Override
     public void cleanUsersTable() {
-        try (Session session = Util.getSessionFactory().openSession()) {
+        try (Session session = sessionFactory.openSession()) {
             session.doWork(new Work() {
                 @Override
-                public void execute(Connection connection) throws SQLException {
+                public void execute(Connection connection) {
                     Transaction transaction = null;
                     try {
                         DatabaseMetaData dbm = connection.getMetaData();
@@ -147,8 +147,9 @@ public class UserDaoHibernateImpl implements UserDao {
                             transaction = session.beginTransaction();
                             session.createSQLQuery(hql).executeUpdate();
                             session.getTransaction().commit();
+                            session.close();
                         }
-                    } catch (Exception e) {
+                    } catch (SQLException e) {
                         e.printStackTrace();
                         System.out.println("Таблицы не существует");
                         assert transaction != null;

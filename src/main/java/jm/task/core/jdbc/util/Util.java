@@ -1,12 +1,12 @@
 package jm.task.core.jdbc.util;
 
 import jm.task.core.jdbc.model.User;
-import org.hibernate.Session;
 import org.hibernate.SessionFactory;
+import org.hibernate.boot.MetadataSources;
+import org.hibernate.boot.registry.StandardServiceRegistry;
 import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
 import org.hibernate.cfg.Configuration;
 import org.hibernate.cfg.Environment;
-import org.hibernate.service.ServiceRegistry;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -23,7 +23,7 @@ public class Util {
     private static final String DB_DIALECT = "org.hibernate.dialect.MySQL5Dialect";
 
     //JDBC connection
-    public Connection getConnection() {
+    public static Connection getConnection() {
         Connection connection = null;
         try {
             connection = DriverManager.getConnection(DB_URL, DB_USERNAME, DB_PASS);
@@ -36,36 +36,38 @@ public class Util {
     }
 
     //Hibernate connection
-    public static SessionFactory getSessionFactory() {
-        if (sessionFactory == null) {
-            try {
-                Configuration configuration = new Configuration();
+    static {
+        Configuration configuration = new Configuration();
 
-                Properties settings = new Properties();
-                settings.put(Environment.DRIVER, DB_DRIVER);
-                settings.put(Environment.URL, DB_URL);
-                settings.put(Environment.USER, DB_USERNAME);
-                settings.put(Environment.PASS, DB_PASS);
-                settings.put(Environment.DIALECT, DB_DIALECT);
+        Properties settings = new Properties();
+        settings.put(Environment.DRIVER, DB_DRIVER);
+        settings.put(Environment.URL, DB_URL);
+        settings.put(Environment.USER, DB_USERNAME);
+        settings.put(Environment.PASS, DB_PASS);
+        settings.put(Environment.DIALECT, DB_DIALECT);
 
-                settings.put(Environment.SHOW_SQL, "true");
+        settings.put(Environment.SHOW_SQL, "true");
 
-                settings.put(Environment.CURRENT_SESSION_CONTEXT_CLASS, "thread");
+        settings.put(Environment.CURRENT_SESSION_CONTEXT_CLASS, "thread");
 
-//                settings.put(Environment.HBM2DDL_AUTO, "update");
+        settings.put(Environment.HBM2DDL_AUTO, "update");
 
-                configuration.setProperties(settings);
+        configuration.setProperties(settings);
 
-                configuration.addAnnotatedClass(User.class);
+        configuration.addAnnotatedClass(User.class);
 
-                ServiceRegistry serviceRegistry = new StandardServiceRegistryBuilder()
-                        .applySettings(configuration.getProperties()).build();
+        final StandardServiceRegistry serviceRegistry = new StandardServiceRegistryBuilder()
+                .applySettings(configuration.getProperties()).build();
+        try {
+            sessionFactory = configuration.buildSessionFactory(serviceRegistry);
+//                    new MetadataSources(serviceRegistry).buildMetadata().buildSessionFactory();
 
-                sessionFactory = configuration.buildSessionFactory(serviceRegistry);
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            StandardServiceRegistryBuilder.destroy(serviceRegistry);
         }
+    }
+    public static SessionFactory getSessionFactory() {
         return sessionFactory;
     }
 }

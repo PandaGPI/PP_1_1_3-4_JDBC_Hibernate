@@ -39,32 +39,34 @@ public class Util {
     static {
         Configuration configuration = new Configuration();
 
-        Properties settings = new Properties();
-        settings.put(Environment.DRIVER, DB_DRIVER);
-        settings.put(Environment.URL, DB_URL);
-        settings.put(Environment.USER, DB_USERNAME);
-        settings.put(Environment.PASS, DB_PASS);
-        settings.put(Environment.DIALECT, DB_DIALECT);
+        Properties properties = new Properties();
+        properties.put(Environment.DRIVER, DB_DRIVER);
+        properties.put(Environment.URL, DB_URL);
+        properties.put(Environment.USER, DB_USERNAME);
+        properties.put(Environment.PASS, DB_PASS);
+        properties.put(Environment.DIALECT, DB_DIALECT);
 
-        settings.put(Environment.SHOW_SQL, "true");
+        properties.put(Environment.SHOW_SQL, "true");
 
-        settings.put(Environment.CURRENT_SESSION_CONTEXT_CLASS, "thread");
+        properties.put(Environment.CURRENT_SESSION_CONTEXT_CLASS, "thread");
 
-        settings.put(Environment.HBM2DDL_AUTO, "update");
+        properties.put(Environment.HBM2DDL_AUTO, "none");
 
-        configuration.setProperties(settings);
+        configuration.setProperties(properties);
 
         configuration.addAnnotatedClass(User.class);
 
-        final StandardServiceRegistry serviceRegistry = new StandardServiceRegistryBuilder()
-                .applySettings(configuration.getProperties()).build();
+//        final StandardServiceRegistry serviceRegistry = new StandardServiceRegistryBuilder()
+//                .applySettings(configuration.getProperties()).build();
         try {
-            sessionFactory = configuration.buildSessionFactory(serviceRegistry);
+            sessionFactory =
+                    configuration.buildSessionFactory();
+//                    configuration.buildSessionFactory(serviceRegistry);
 //                    new MetadataSources(serviceRegistry).buildMetadata().buildSessionFactory();
 
         } catch (Exception e) {
             e.printStackTrace();
-            StandardServiceRegistryBuilder.destroy(serviceRegistry);
+//            StandardServiceRegistryBuilder.destroy(serviceRegistry);
         }
     }
     public static SessionFactory getSessionFactory() {

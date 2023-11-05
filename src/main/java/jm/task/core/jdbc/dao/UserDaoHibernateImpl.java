@@ -33,7 +33,7 @@ public class UserDaoHibernateImpl implements UserDao {
                         DatabaseMetaData dbm = connection.getMetaData();
                         ResultSet tables = dbm.getTables(null, "idea", "User", new String[]{"table"});
                         final String sql = "CREATE TABLE user " +
-                                "(id BIGINT NOT NULL UNIQUE AUTO_INCREMENT, name VARCHAR(255), lastName VARCHAR(255), age int)";
+                                "(id BIGINT NOT NULL UNIQUE AUTO_INCREMENT, name VARCHAR(255), lastName VARCHAR(255), age TINYINT)";
                         if (!tables.next()) {
                             transaction = session.beginTransaction();
                             session.createSQLQuery(sql).executeUpdate();

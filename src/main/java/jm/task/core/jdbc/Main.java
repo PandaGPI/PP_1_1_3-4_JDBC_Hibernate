@@ -6,7 +6,7 @@ public class Main {
     public static void main(String[] args) {
 
         UserServiceImpl userService = new UserServiceImpl();
-//        userService.dropUsersTable();
+        userService.dropUsersTable();
         userService.createUsersTable();
         userService.saveUser("Pirogov", "Grigory", (byte) 34);
         userService.saveUser("Pirogov", "Grigory", (byte) 36);
@@ -15,8 +15,8 @@ public class Main {
         userService.saveUser("Java", "Mentor", (byte) 8);
         userService.cleanUsersTable();
         System.out.println(userService.getAllUsers());
-//        userService.cleanUsersTable();
-//        userService.dropUsersTable();
+        userService.cleanUsersTable();
+        userService.dropUsersTable();
 
 
 //        userService.removeUserById(4);
